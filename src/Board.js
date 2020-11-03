@@ -72,8 +72,8 @@
 
     // 특정 좌표가 주어졌을 때, 해당 좌표를 지나는 슬래시 대각선(slash, /)의 첫 번째 행 컬럼을 반환합니다.
     // ex) rowIndex: 1, colIndex: 3이 주어졌을 때 4 반환
-    //          -1 0 1 2 3 4
-    // ----------------------
+    //          0 1 2 3 4 5 6
+    // ----------------------   n*2 - 2
     //       0    [0,0,0,0]1
     //       1    [0,0,0,1]
     //       2    [0,0,1,0]
@@ -84,14 +84,14 @@
 
     // 특정 좌표가 주어졌을 때, 해당 좌표를 지나는 역 슬래시 대각선(backslash, \)의 첫 번째 행 컬럼을 반환합니다.
     // ex) rowIndex: 1, colIndex: 0이 주어졌을 때 -1 반환
-    //          -1 0 1 2 3 4
-    // ----------------------
+    //        -3 -2 -1 0 1 2 3 
+    // ----------------------  col(0) - row(1) = result (-1)
     //       0   1[0,0,0,0]
     //       1    [1,0,0,0]
     //       2    [0,1,0,0]
     //       3    [0,0,1,0]
     _getFirstRowColumnIndexForBackSlashOn: function (rowIndex, colIndex) {
-      return colIndex - rowIndex;
+      return colIndex - rowIndex; 
     },
 
     // 체스 판 위에 서로 공격할 수 있는 룩이 한 쌍이라도 있는지 검사합니다.
@@ -156,11 +156,27 @@
     //
     // 주어진 행(rowIndex)에 충돌하는 말이 있는지 확인합니다.
     hasRowConflictAt: function (rowIndex) {
+      let board = this.get(rowIndex)
+      let count = 0;
+
+      for(let i = 0; i < board.length ; i ++){
+        if(board[i] === 1){
+          count ++
+        }
+      }
+      if(count > 1){
+        return true
+      }
       return false; // fixme
     },
 
     // 체스 판 위에 행 충돌이 하나라도 있는지 검사합니다.
     hasAnyRowConflicts: function () {
+    for(let i = 0 ; i < this.get('n'); i++){
+     if(this.hasRowConflictAt(i)){
+       return true;
+     }
+    }
       return false; // fixme
     },
 
@@ -169,11 +185,25 @@
     //
     // 주어진 열(colIndex)에 충돌하는 말이 있는지 확인합니다.
     hasColConflictAt: function (colIndex) {
+      let count = 0;
+      for(let i = 0; i < this.get('n') ; i++){
+          if(this.rows()[i][colIndex]===1){
+            count++
+          }
+      }
+      if(count > 1){
+        return true;
+      }
       return false; // fixme
     },
 
     // 체스 판 위에 열 충돌이 하나라도 있는지 검사합니다.
     hasAnyColConflicts: function () {
+      for(let i= 0 ; i < this.get('n');i++){
+        if(this.hasColConflictAt(i)){
+          return true
+        }
+      }
       return false; // fixme
     },
 
@@ -182,11 +212,29 @@
     //
     // 주어진 슬래시 대각선(/)에 충돌하는 말이 있는지 확인합니다.
     hasSlashConflictAt: function (SlashColumnIndexAtFirstRow) {
+      let count = 0
+      for(let i = 0 ; i < this.get('n'); i++){
+        let row = i;
+        let col = SlashColumnIndexAtFirstRow - row 
+        if(this._isInBounds(row,col)){
+          if(this.rows()[row][col]===1){
+            count++
+          }
+        }
+      } 
+      if(count > 1){
+        return true; 
+      }
       return false; // fixme
     },
 
     // 체스 판 위에 슬래시 대각선(/)에 충돌이 하나라도 있는지 검사합니다.
     hasAnySlashConflicts: function () {
+      for(let i = 0; i<=this.get('n')*2-2; i++){    
+        if(this.hasSlashConflictAt(i)){
+          return true
+        }
+      }
       return false; // fixme
     },
 
@@ -194,12 +242,30 @@
     // --------------------------------------------------------------
     //
     // 주어진 역 슬래시 대각선(\)에 충돌하는 말이 있는지 확인합니다.
-    hasBackSlashConflictAt: function (BackSlashColumnIndexAtFirstRow) {
+    hasBackSlashConflictAt: function (BackSlashColumnIndexAtFirstRow) {    
+      let count = 0
+      for(let i = 0 ; i < this.get('n'); i++){
+        let row = i;
+        let col = BackSlashColumnIndexAtFirstRow + row 
+        if(this._isInBounds(row,col)){
+          if(this.rows()[row][col]===1){
+            count++
+          }
+        }
+      } 
+      if(count > 1){
+        return true; 
+      }
       return false; // fixme
     },
 
     // 체스 판 위에 역 슬래시 대각선(\) 충돌이 하나라도 있는지 검사합니다.
     hasAnyBackSlashConflicts: function () {
+      for(let i = -(this.get('n')-1); i<=this.get('n')-1; i++){    
+        if(this.hasBackSlashConflictAt(i)){
+          return true
+        }
+      } 
       return false; // fixme
     },
 
